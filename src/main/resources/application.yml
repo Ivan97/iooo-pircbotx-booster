@@ -1,0 +1,5 @@
+pircbot:
+  servers:
+  - hostname: chat.freenode.net
+    port: 6667
+  tls-enable: true
