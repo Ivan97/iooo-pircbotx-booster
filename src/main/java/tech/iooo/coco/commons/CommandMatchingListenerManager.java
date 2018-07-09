@@ -39,7 +39,7 @@ public class CommandMatchingListenerManager extends ThreadedListenerManager impl
       if (!Strings.isNullOrEmpty(command)) {
         Listener listener = commandListenerService.getListenersWithCommands().get(command);
         if (logger.isDebugEnabled()) {
-          logger.debug("redirect to listener [{}] on command [{}]", listener.getClass().getSimpleName(), command);
+          logger.debug("redirect to listener on command [{}]", command);
         }
         submitEvent(pool, listener, event);
       }

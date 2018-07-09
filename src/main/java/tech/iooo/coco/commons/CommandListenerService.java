@@ -1,8 +1,8 @@
 package tech.iooo.coco.commons;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +25,7 @@ public class CommandListenerService implements ApplicationContextAware, Initiali
   private ApplicationContext applicationContext;
 
   @Getter
-  private Map<String, Listener> listenersWithCommands = Maps.newHashMap();
+  private HashBiMap<String, Listener> listenersWithCommands = HashBiMap.create();
   @Getter
   private List<Listener> listenersWithoutCommands = Lists.newArrayList();
 
