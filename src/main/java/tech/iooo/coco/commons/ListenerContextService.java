@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  * @author <a href="mailto:yangkizhang@gmail.com?subject=iooo-pircbotx-booster">Ivan97</a>
  */
 @Service
-public class CommandListenerService implements ApplicationContextAware, InitializingBean {
+public class ListenerContextService implements ApplicationContextAware, InitializingBean {
 
   private ApplicationContext applicationContext;
 

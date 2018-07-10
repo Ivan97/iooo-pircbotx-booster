@@ -15,7 +15,7 @@ public class IoooListenerAdapter extends ListenerAdapter {
   @Autowired
   private PircbotProperties pircbotProperties;
   @Autowired
-  private CommandListenerService commandListenerService;
+  private ListenerContextService listenerContextService;
 
   protected String resolveMessage(String message) {
     if (message.split(" ").length > 1) {
@@ -41,7 +41,7 @@ public class IoooListenerAdapter extends ListenerAdapter {
 
   private String getCommand(String[] data) {
     String command = data[0].replaceFirst(pircbotProperties.getCommandPrefix(), "").trim();
-    if (commandListenerService.commands().contains(command)) {
+    if (listenerContextService.commands().contains(command)) {
       return command;
     } else {
       return "";

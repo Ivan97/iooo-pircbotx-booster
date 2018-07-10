@@ -29,7 +29,7 @@ public class CommandMatchingListenerManager extends ThreadedListenerManager impl
   @Autowired
   private PircbotProperties pircbotProperties;
   @Autowired
-  private CommandListenerService commandListenerService;
+  private ListenerContextService listenerContextService;
 
   @Override
   public void onEvent(Event event) {
@@ -37,7 +37,7 @@ public class CommandMatchingListenerManager extends ThreadedListenerManager impl
       case MESSAGE: {
         String command = getCommand(((GenericMessageEvent) event).getMessage());
         if (!Strings.isNullOrEmpty(command)) {
-          Listener commandListeners = commandListenerService.getCommandListeners().get(command);
+          Listener commandListeners = listenerContextService.getCommandListeners().get(command);
           if (logger.isDebugEnabled()) {
             logger.debug("redirect to listener on command [{}]", command);
           }
@@ -49,14 +49,14 @@ public class CommandMatchingListenerManager extends ThreadedListenerManager impl
         if (logger.isDebugEnabled()) {
           logger.debug("redirect to listener on action [{}]", ((ActionEvent) event).getAction());
         }
-        commandListenerService.getActionListeners().forEach(listener -> submitEvent(pool, listener, event));
+        listenerContextService.getActionListeners().forEach(listener -> submitEvent(pool, listener, event));
         break;
       }
       case COMMON_EVENT: {
         if (logger.isDebugEnabled()) {
           logger.debug("redirect to listener on event [{}]", event.getClass().getSimpleName());
         }
-        commandListenerService.getEventListeners().forEach(listener -> submitEvent(pool, listener, event));
+        listenerContextService.getEventListeners().forEach(listener -> submitEvent(pool, listener, event));
         break;
       }
       default:
@@ -68,7 +68,7 @@ public class CommandMatchingListenerManager extends ThreadedListenerManager impl
   @Bean
   public ThreadedListenerManager listenerManager() {
     ThreadedListenerManager listenerManager = new ThreadedListenerManager();
-    commandListenerService.listeners().forEach(listenerManager::addListener);
+    listenerContextService.listeners().forEach(listenerManager::addListener);
     return listenerManager;
   }
 
@@ -80,7 +80,7 @@ public class CommandMatchingListenerManager extends ThreadedListenerManager impl
   private String getCommand(String message) {
     if (!Strings.isNullOrEmpty(message)) {
       String command = message.split(" ")[0].replaceFirst(pircbotProperties.getCommandPrefix(), "");
-      if (commandListenerService.commands().contains(command)) {
+      if (listenerContextService.commands().contains(command)) {
         return command;
       } else {
         return null;
