@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import org.pircbotx.hooks.events.FingerEvent;
 import org.pircbotx.hooks.events.PingEvent;
 import org.pircbotx.hooks.events.TimeEvent;
 import org.pircbotx.hooks.events.TopicEvent;
@@ -63,6 +64,11 @@ public class CommonEventListener extends BaseEventListener {
   }
 
   @Override
+  public void onFinger(FingerEvent event) {
+    Objects.requireNonNull(event.getUser()).send().message("You ought to be arrested for fingering a bot!");
+  }
+
+  @Override
   public void onUnknown(UnknownEvent event) throws Exception {
 
     UnknownEventMessageResolver resolver = UnknownEventMessageResolver.Builder.anUnknownEventMessageResolver()
@@ -74,6 +80,8 @@ public class CommonEventListener extends BaseEventListener {
       case "USERINFO":
         event.getBot().send().message(resolver.getUser(), "I`m just a bot.");
         break;
+      case "CLIENTINFO":
+        event.getBot().send().message(resolver.getUser(), System.getProperty("java.home"));
       default:
         break;
     }
