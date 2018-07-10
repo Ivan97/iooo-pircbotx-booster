@@ -20,7 +20,7 @@ public class PircbotProperties {
   private static final List<String> DEFAULT_CHANNELS = Collections.singletonList("#SimpleBot");
   @NestedConfigurationProperty
   private static final List<ServerEntry> DEFAULT_SERVERS = Collections
-      .singletonList(new ServerEntry("irc.freenode.net", 6667));
+      .singletonList(new ServerEntry("irc.freenode.net", 6697));
 
   private String commandPrefix = ".";
 
