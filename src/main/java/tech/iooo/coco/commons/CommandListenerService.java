@@ -25,9 +25,11 @@ public class CommandListenerService implements ApplicationContextAware, Initiali
   private ApplicationContext applicationContext;
 
   @Getter
-  private HashBiMap<String, Listener> listenersWithCommands = HashBiMap.create();
+  private HashBiMap<String, Listener> commandListeners = HashBiMap.create();
   @Getter
-  private List<Listener> listenersWithoutCommands = Lists.newArrayList();
+  private List<Listener> eventListeners = Lists.newArrayList();
+  @Getter
+  private List<Listener> actionListeners = Lists.newArrayList();
 
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -35,11 +37,11 @@ public class CommandListenerService implements ApplicationContextAware, Initiali
   }
 
   public Iterable<Listener> listeners() {
-    return this.listenersWithCommands.values();
+    return this.commandListeners.values();
   }
 
   public Set<String> commands() {
-    return this.listenersWithCommands.keySet();
+    return this.commandListeners.keySet();
   }
 
   @Override
@@ -48,12 +50,13 @@ public class CommandListenerService implements ApplicationContextAware, Initiali
 
     eventListeners.forEach((name, listener) -> {
       IrcEventListener annotation = applicationContext.findAnnotationOnBean(name, IrcEventListener.class);
-      if (Strings.isNullOrEmpty(annotation.command())) {
-        listenersWithoutCommands.add((Listener) listener);
+      if (!Strings.isNullOrEmpty(annotation.command())) {
+        this.commandListeners.put(annotation.command(), (Listener) listener);
+      } else if (annotation.action()) {
+        this.actionListeners.add((Listener) listener);
       } else {
-        listenersWithCommands.put(annotation.command(), (Listener) listener);
+        this.eventListeners.add((Listener) listener);
       }
     });
-
   }
 }

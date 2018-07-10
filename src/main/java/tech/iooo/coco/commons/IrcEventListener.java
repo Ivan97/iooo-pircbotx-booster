@@ -19,4 +19,6 @@ import org.springframework.stereotype.Service;
 public @interface IrcEventListener {
 
   String command() default "";
+
+  boolean action() default false;
 }

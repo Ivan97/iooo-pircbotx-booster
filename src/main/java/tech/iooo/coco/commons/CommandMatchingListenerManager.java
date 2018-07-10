@@ -4,8 +4,7 @@ import com.google.common.base.Strings;
 import java.util.concurrent.ExecutorService;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.Listener;
-import org.pircbotx.hooks.events.MessageEvent;
-import org.pircbotx.hooks.events.PrivateMessageEvent;
+import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.slf4j.Logger;
@@ -34,17 +33,34 @@ public class CommandMatchingListenerManager extends ThreadedListenerManager impl
 
   @Override
   public void onEvent(Event event) {
-    if (event instanceof MessageEvent || event instanceof PrivateMessageEvent) {
-      String command = getCommand(((GenericMessageEvent) event).getMessage());
-      if (!Strings.isNullOrEmpty(command)) {
-        Listener listener = commandListenerService.getListenersWithCommands().get(command);
-        if (logger.isDebugEnabled()) {
-          logger.debug("redirect to listener on command [{}]", command);
+    switch (EventWatchDog.sniff(event)) {
+      case MESSAGE: {
+        String command = getCommand(((GenericMessageEvent) event).getMessage());
+        if (!Strings.isNullOrEmpty(command)) {
+          Listener commandListeners = commandListenerService.getCommandListeners().get(command);
+          if (logger.isDebugEnabled()) {
+            logger.debug("redirect to listener on command [{}]", command);
+          }
+          submitEvent(pool, commandListeners, event);
         }
-        submitEvent(pool, listener, event);
+        break;
       }
-    } else {
-      commandListenerService.getListenersWithoutCommands().forEach(listener -> submitEvent(pool, listener, event));
+      case ACTION: {
+        if (logger.isDebugEnabled()) {
+          logger.debug("redirect to listener on action [{}]", ((ActionEvent) event).getAction());
+        }
+        commandListenerService.getActionListeners().forEach(listener -> submitEvent(pool, listener, event));
+        break;
+      }
+      case COMMON_EVENT: {
+        if (logger.isDebugEnabled()) {
+          logger.debug("redirect to listener on event [{}]", event.getClass().getSimpleName());
+        }
+        commandListenerService.getEventListeners().forEach(listener -> submitEvent(pool, listener, event));
+        break;
+      }
+      default:
+        break;
     }
   }
 
