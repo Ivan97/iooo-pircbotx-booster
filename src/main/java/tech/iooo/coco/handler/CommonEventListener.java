@@ -68,6 +68,10 @@ public class CommonEventListener extends BaseEventListener {
     Objects.requireNonNull(event.getUser()).send().message("You ought to be arrested for fingering a bot!");
   }
 
+//  @Override
+//  public void onJoin(JoinEvent event) throws Exception {
+//  }
+
   @Override
   public void onUnknown(UnknownEvent event) throws Exception {
 

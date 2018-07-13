@@ -1,15 +1,19 @@
 package tech.iooo.coco.configuration;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.net.ssl.SSLSocketFactory;
 import org.pircbotx.Configuration.Builder;
+import org.pircbotx.Configuration.ServerEntry;
 import org.pircbotx.IdentServer;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UtilSSLSocketFactory;
+import org.pircbotx.cap.SASLCapHandler;
 import org.pircbotx.cap.TLSCapHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import tech.iooo.coco.commons.CommandMatchingListenerManager;
 import tech.iooo.coco.commons.PircbotProperties;
 
@@ -19,7 +23,7 @@ import tech.iooo.coco.commons.PircbotProperties;
  * @author <a href="mailto:yangkizhang@gmail.com?subject=iooo-pircbotx-booster">Ivan97</a>
  */
 @EnableConfigurationProperties(PircbotProperties.class)
-@org.springframework.context.annotation.Configuration
+@Configuration
 public class PircbotxConfiguration {
 
   @Autowired
@@ -30,13 +34,15 @@ public class PircbotxConfiguration {
 
   @Bean
   public PircBotX pircBotX() {
-    
-    if (pircbotProperties.isIdentServerEnable()){
+
+    if (pircbotProperties.isIdentServerEnable()) {
       IdentServer.startServer();
     }
-    
+
     Builder builder = new Builder()
-        .addServers(pircbotProperties.getServers())
+        .addServers(pircbotProperties.getServers().stream()
+            .map(serverInfo -> new ServerEntry(serverInfo.getHostname(), serverInfo.getPort()))
+            .collect(Collectors.toList()))
         .setName(pircbotProperties.getName())
         .setLogin(pircbotProperties.getLogin())
         .setAutoReconnect(pircbotProperties.isAutoReconnect())
@@ -47,7 +53,7 @@ public class PircbotxConfiguration {
         .setAutoNickChange(pircbotProperties.isAutoNickChange())
         .addAutoJoinChannels(pircbotProperties.getChannels())
         .setListenerManager(commandMatchingListenerManager);
-    
+
     if (Objects.nonNull(pircbotProperties.getSslSocketType())) {
       switch (pircbotProperties.getSslSocketType()) {
         case DEFAULT:
@@ -62,8 +68,15 @@ public class PircbotxConfiguration {
           break;
       }
     }
-    if (pircbotProperties.isTlsEnable()){
-      builder.addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true));
+    if (pircbotProperties.isTlsEnable()) {
+      pircbotProperties.getServers().forEach(server -> {
+        if (server.getHostname().toLowerCase().contains("freenode.net")) {
+          builder
+              .addCapHandler(new SASLCapHandler(pircbotProperties.getName(), pircbotProperties.getPassword(), false));
+        } else {
+          builder.addCapHandler(new TLSCapHandler((SSLSocketFactory) SSLSocketFactory.getDefault(), true));
+        }
+      });
     }
     return new PircBotX(builder.buildConfiguration());
   }
