@@ -1,12 +1,14 @@
 pircbot:
   servers:
   - hostname: chat.freenode.net
-    port: 6667
+    port: 6697
   tls-enable: true
   channels:
     - "#SimpleBot"
 #    - "#linuxba"
   password: ${bot.sasl.password}
+  ssl-socket-type: default
+
 application:
   wry-dat:
     update-time: "20180625"
