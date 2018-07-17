@@ -98,6 +98,11 @@
       <artifactId>java-verbal-expressions</artifactId>
       <version>1.5</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.jarod</groupId>
+      <artifactId>qqwry-java</artifactId>
+      <version>0.7.0</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>

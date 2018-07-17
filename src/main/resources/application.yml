@@ -7,3 +7,6 @@ pircbot:
     - "#SimpleBot"
 #    - "#linuxba"
   password: ${bot.sasl.password}
+application:
+  wry-dat:
+    update-time: "20180625"

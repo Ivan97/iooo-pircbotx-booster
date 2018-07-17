@@ -1,0 +1,3 @@
+[submodule "src/main/resources/data/qqwry.dat"]
+	path = src/main/resources/data/qqwry.dat
+	url = https://github.com/WisdomFusion/qqwry.dat.git
