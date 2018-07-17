@@ -9,11 +9,12 @@ import tech.iooo.coco.commons.IrcEventListener;
  *
  * @author <a href="mailto:yangkizhang@gmail.com?subject=iooo-pircbotx-booster">Ivan97</a>
  */
-@IrcEventListener(command = "echo")
-public class EchoListener extends IoooListenerAdapter {
+@IrcEventListener(command = "revert")
+public class RevertCommandListener extends IoooListenerAdapter {
 
   @Override
   public void onGenericMessage(GenericMessageEvent event) throws Exception {
-    event.respond(getCommand(event.getMessage()) + "|" + resolveMessage(event.getMessage()));
+    event.respond(getCommand(event.getMessage()) + "|" + new StringBuilder(resolveMessage(event.getMessage())).reverse()
+        .toString());
   }
 }
